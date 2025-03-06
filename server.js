@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000; // Use environment variable for port
 
 // Enable CORS for frontend-backend communication
 app.use(cors({
-    origin: '*' // Allow requests from any origin (replace with your frontend URL in production)
+    origin: 'https://dawn-k-vinod.github.io/CodeForge-frontend/' // Allow requests from any origin (replace with your frontend URL in production)
 }));
 app.use(express.json());
 
