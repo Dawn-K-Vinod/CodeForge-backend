@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: codeforge-backend
+    region: singapore  # Use the region closest to you
+    env: docker  # Specify that this is a Docker-based service
+    buildCommand: docker build -t codeforge-backend .
+    startCommand: docker run -p 3000:3000 codeforge-backend
+    envVars:
+      - key: PORT
+        value: 3000
