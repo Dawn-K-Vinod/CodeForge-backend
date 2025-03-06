@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeForge Converter</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CodeMirror for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/theme/dracula.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --output-bg: #2d2d2d;
+            --output-text: #f8f8f2;
+            --primary-color: #007BFF;
+            --secondary-color: #0056b3;
+            --accent-color: #ff4757;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #f8f8f2;
+            --output-bg: #333;
+            --output-text: #f8f8f2;
+            --primary-color: #1e90ff;
+            --secondary-color: #0077cc;
+            --accent-color: #ff6b81;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: slideInLeft 1s ease-in-out;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 15px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        textarea:focus, input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        pre {
+            background-color: var(--output-bg);
+            color: var(--output-text);
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        button {
+            padding: 15px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .output {
+            margin-top: 30px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 1s ease-in-out;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 1rem;
+        }
+
+        /* Pop-up Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            text-align: center;
+        }
+
+        .popup h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .popup p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .popup button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        /* Floating Image Styles */
+        .header-image {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .header-image img {
+            width: 200px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: var(--primary-color);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+        }
+
+        /* Hide sections by default */
+        .section {
+            display: none;
+        }
+
+        /* Show the active section */
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <!-- Pop-up Window -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <h2>Welcome to CodeForge Converter!</h2>
+        <p>This webpage allows you to convert C code to assembly, as well as convert English words or numbers to binary.</p>
+        <p>Created by <strong>Johns Jose & Dawn</strong> | B.Tech CSE - A</p>
+        <button onclick="closePopup()">Get Started</button>
+    </div>
+
+    <!-- Floating Header Image -->
+    <div class="header-image">
+        <img src="binary.jpg" alt="Binary Image">
+    </div>
+
+    <h1>CodeForge Converter</h1>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="#c-to-asm" onclick="showSection('c-to-asm')">C to Assembly</a>
+        <a href="#text-to-binary" onclick="showSection('text-to-binary')">Text to Binary</a>
+    </div>
+
+    <!-- Section 1: C Code to Assembly and Binary -->
+    <div id="c-to-asm" class="section active">
+        <h2>C Code to Assembly</h2>
+        <p>Enter a simple C program to see its assembly representation.</p>
+        <textarea id="c_code" rows="10" placeholder="Enter C code here...">
+#include <stdio.h>
+
+int main() {
+    int x = 10;
+    int y = x + 1;
+    return y;
+}
+        </textarea>
+        <br>
+        <button onclick="convertCode()">Convert C Code</button>
+        <button onclick="loadRandomProgram()">Load Random C Program</button>
+
+        <div class="output">
+            <h3>Assembly Code</h3>
+            <pre id="assembly_output">Assembly code will appear here...</pre>
+            <button onclick="downloadOutput('assembly_output', 'assembly.s')">Download Assembly</button>
+        </div>
+    </div>
+
+    <!-- Section 2: English Words/Numbers to Binary -->
+    <div id="text-to-binary" class="section">
+        <h2>English Words/Numbers to Binary</h2>
+        <p>Enter an English word or number to see its binary representation.</p>
+        <input type="text" id="text_input" placeholder="Enter text or number here...">
+        <br>
+        <button onclick="convertText()">Convert Text</button>
+
+        <div class="output">
+            <h3>Binary Output</h3>
+            <pre id="text_binary_output">Binary output will appear here...</pre>
+            <button onclick="downloadOutput('text_binary_output', 'text_binary.txt')">Download Binary</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 Created by <strong>Johns Jose & Dawn</strong> | B.Tech CSE - A
+    </footer>
+
+    <!-- CodeMirror Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/mode/clike/clike.min.js"></script>
+    <script>
+        // Initialize CodeMirror for Syntax Highlighting
+        const editor = CodeMirror.fromTextArea(document.getElementById("c_code"), {
+            mode: "text/x-csrc",
+            lineNumbers: true,
+            theme: "dracula",
+            autoCloseBrackets: true,
+            matchBrackets: true,
+        });
+
+        // Show Pop-up on Page Load
+        window.onload = function () {
+            document.getElementById("popup").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+        };
+
+        // Close Pop-up
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const body = document.body;
+            const darkModeToggle = document.querySelector('.dark-mode-toggle');
+
+            //Toggle the theme
+            body.dataset.theme = body.dataset.theme === "dark" ? "" : "dark";
+
+            // Update the button text based on the current theme
+            if (body.dataset.theme === "dark") {
+                darkModeToggle.textContent = "Toggle Light Mode";
+            } else {
+                darkModeToggle.textContent = "Toggle Dark Mode";
+            }
+        }
+
+        // Function to show the selected section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Function to simulate C to Assembly conversion
+        async function convertCode() {
+            const cCode = editor.getValue();
+
+            try {
+                // Send the C code to the backend for compilation
+                const response = await fetch('http://localhost:3000/compile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: cCode }),
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById("assembly_output").textContent = `Error: ${data.error}`;
+                } else {
+                    document.getElementById("assembly_output").textContent = data.assembly;
+                }
+            } catch (error) {
+                document.getElementById("assembly_output").textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Function to convert text to binary
+        function convertText() {
+            const text = document.getElementById("text_input").value;
+
+            // Check if the input is a number
+            if (!isNaN(text)) {
+                // Convert the number to binary
+                const number = parseInt(text, 10);
+                if (!isNaN(number)) {
+                    const binaryOutput = number.toString(2);
+                    document.getElementById("text_binary_output").textContent = binaryOutput;
+                } else {
+                    document.getElementById("text_binary_output").textContent = "Invalid number";
+                }
+            } else {
+                // Convert text to binary
+                let binaryOutput = "";
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i); // Get Unicode value of the character
+                    const binary = charCode.toString(2).padStart(8, "0"); // Convert to 8-bit binary
+                    binaryOutput += binary + " "; // Add space between bytes
+                }
+                // Display binary output
+                document.getElementById("text_binary_output").textContent = binaryOutput.trim();
+            }
+        }
+
+        // Function to download output
+        function downloadOutput(elementId, fileName) {
+            const content = document.getElementById(elementId).textContent;
+            const blob = new Blob([content], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Function to load a random C program
+        function loadRandomProgram() {
+            const randomPrograms = [
+//Random 1
+`//Sum of two numbers
+#include <stdio.h>
+int main() {
+    int a = 5;
+    int b = 10;
+    int sum = a + b;
+    printf("Sum: %d\\n", sum);
+    return 0;
+}`,
+
+//Random 2
+`//Printing a string multiple times using loop.
+#include <stdio.h>
+int main() {
+    for (int i = 1; i <= 5; i++) {
+        printf("Hello, World! %d\\n", i);
+    }
+    return 0;
+}`,
+
+//Random 3
+`//Read and display a number
+#include <stdio.h>
+int main() {
+    int num;
+    printf("Enter a number: ");
+    scanf("%d", &num);
+    printf("You entered: %d\\n", num);
+    return 0;
+}`,
+
+//Random 4
+`//Factorial of 5
+#include <stdio.h>
+int main() {
+    int factorial = 1;
+    for (int i = 1; i <= 5; i++) {
+        factorial *= i;
+    }
+    printf("Factorial of 5: %d\\n", factorial);
+    return 0;
+}`,
+
+//Random 5
+`#include <stdio.h>
+int main() {
+    printf("Hello, Welcome to CodeForge World!\\n");
+    return 0;
+}`,
+
+//Random 6
+`//Even or Odd
+#include <stdio.h>
+int main() {
+    int num = 7;
+    printf(num % 2 == 0 ? "Even\\n" : "Odd\\n");
+    return 0;
+}`,
+
+//Random 7
+`//Swap two numbers
+#include <stdio.h>
+int main() {
+    int a = 3, b = 5;
+    a = a + b; b = a - b; a = a - b;
+    printf("a: %d, b: %d\\n", a, b);
+    return 0;
+}`,
+
+//Random 8
+`//Prime or not
+#include <stdio.h>
+int main() {
+    int n = 13, i, flag = 1;
+    for (i = 2; i <= n / 2; i++) if (n % i == 0) { flag = 0; break; }
+    printf(flag ? "Prime\\n" : "Not Prime\\n");
+    return 0;
+}`,
+
+//Random 9
+`//Fibonacci
+#include <stdio.h>
+int main() {
+    int n = 5, a = 0, b = 1;
+    for (int i = 0; i < n; i++) { printf("%d ", a); int temp = a; a = b; b = temp + b; }
+    return 0;
+}`,
+
+//Random 10
+`//Reverse a number
+#include <stdio.h>
+int main() {
+    int num = 1234, rev = 0;
+    while (num > 0) { rev = rev * 10 + num % 10; num /= 10; }
+    printf("Reversed: %d\\n", rev);
+    return 0;
+}`
+
+            ];
+
+            // Select a random program
+            const randomIndex = Math.floor(Math.random() * randomPrograms.length);
+            const randomProgram = randomPrograms[randomIndex];
+
+            // Update the CodeMirror editor
+            editor.setValue(randomProgram);
+        }
+    </script>
+</body>
+</html>
