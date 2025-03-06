@@ -353,6 +353,12 @@ int main() {
             matchBrackets: true,
         });
 
+        const response = await fetch('https://codeforge-2rzc.onrender.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: cCode }),
+        });
+
         // Show Pop-up on Page Load
         window.onload = function () {
             document.getElementById("popup").style.display = "block";
