@@ -2,12 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000; // Use environment variable for port
+const port = process.env.PORT || 3000;
+
+// Path to the precompiled GCC binary
+const gccPath = path.join(__dirname, 'tools', 'gcc');
 
 // Enable CORS for frontend-backend communication
 app.use(cors({
-    origin: 'https://dawn-k-vinod.github.io/CodeForge-frontend/' // Allow requests from any origin (replace with your frontend URL in production)
+    origin: 'https://dawn-k-vinod.github.io/CodeForge-frontend/' // Allow all origins (or replace with your frontend URL)
 }));
 app.use(express.json());
 
@@ -23,8 +27,8 @@ app.post('/compile', (req, res) => {
     // Save the C code to a temporary file
     fs.writeFileSync('temp.c', cCode);
 
-    // Compile the C code to assembly using GCC
-    exec('gcc -S -o temp.s temp.c', (error, stdout, stderr) => {
+    // Compile the C code to assembly using the precompiled GCC binary
+    exec(`${gccPath} -S -o temp.s temp.c`, (error, stdout, stderr) => {
         if (error) {
             // Clean up temporary files
             fs.unlinkSync('temp.c');
