@@ -5,9 +5,26 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000; // Use the port provided by Railway or default to 3000
 
-// Enable CORS for frontend-backend communication
-// Allow requests from the frontend URL (set via environment variable)
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+// Allow requests from the frontend domain
+const allowedOrigins = [
+    'https://dawn-k-vinod.github.io', // Allow requests from GitHub Pages
+    'http://localhost:3000' // Allow requests from local development
+];
+
+app.use(cors({ 
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Check if the origin is in the allowed list
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true // Allow cookies and credentials (if needed)
+}));
 
 // Parse JSON request bodies
 app.use(express.json());
