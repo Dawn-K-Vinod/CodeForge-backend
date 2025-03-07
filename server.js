@@ -3,14 +3,15 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const fs = require('fs');
 const app = express();
-const port = process.env.PORT || 3000; // Use the port provided by Railway or default to 3000
+const port = process.env.PORT || 3000;
 
 // Allow requests from the frontend domain
 const allowedOrigins = [
-    'https://dawn-k-vinod.github.io/CodeForge-frontend/', // Allow requests from GitHub Pages
+    'https://dawn-k-vinod.github.io', // Replace with your GitHub Pages link
     'http://localhost:3000' // Allow requests from local development
 ];
 
+// Enable CORS for frontend-backend communication
 app.use(cors({ 
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
@@ -39,6 +40,7 @@ app.post('/compile', (req, res) => {
     // Compile the C code to assembly using GCC
     exec('gcc -S -o temp.s temp.c', (error, stdout, stderr) => {
         if (error) {
+            console.error('GCC Error:', stderr); // Log the error for debugging
             return res.status(500).json({ error: stderr });
         }
 
@@ -54,6 +56,7 @@ app.post('/compile', (req, res) => {
 app.get('/test-gcc', (req, res) => {
     exec('gcc --version', (error, stdout, stderr) => {
         if (error) {
+            console.error('GCC Test Error:', stderr); // Log the error for debugging
             return res.status(500).json({ error: 'GCC not installed' });
         }
         res.json({ gccVersion: stdout });
