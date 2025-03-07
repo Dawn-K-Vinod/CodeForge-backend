@@ -30,6 +30,16 @@ app.use(cors({
 // Parse JSON request bodies
 app.use(express.json());
 
+// Middleware to set Access-Control-Allow-Origin header
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
+
 // Endpoint to compile C code to assembly
 app.post('/compile', (req, res) => {
     const cCode = req.body.code;
