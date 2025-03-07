@@ -7,8 +7,8 @@ const port = process.env.PORT || 3000;
 
 // Allow requests from the frontend domain
 const allowedOrigins = [
-    'https://dawn-k-vinod.github.io/CodeForge-frontend/', // Replace with your GitHub Pages link
-    'http://localhost:3000' // Allow requests from local development
+    'https://dawn-k-vinod.github.io', // Frontend hosted on GitHub Pages
+    'http://localhost:3000' // Local development
 ];
 
 // Enable CORS for frontend-backend communication
@@ -24,21 +24,16 @@ app.use(cors({
             return callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true // Allow cookies and credentials (if needed)
+    credentials: true, // Allow cookies and credentials (if needed)
+    methods: ['GET', 'POST', 'OPTIONS'], // Allow specific HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow specific headers
 }));
 
 // Parse JSON request bodies
 app.use(express.json());
 
-// Middleware to set Access-Control-Allow-Origin header
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
+// Handle preflight requests for all routes
+app.options('*', cors()); // Enable preflight for all routes
 
 // Endpoint to compile C code to assembly
 app.post('/compile', (req, res) => {
