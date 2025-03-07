@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 // Allow requests from the frontend domain
 const allowedOrigins = [
-    'https://dawn-k-vinod.github.io', // Replace with your GitHub Pages link
+    'https://dawn-k-vinod.github.io/CodeForge-frontend/', // Replace with your GitHub Pages link
     'http://localhost:3000' // Allow requests from local development
 ];
 
