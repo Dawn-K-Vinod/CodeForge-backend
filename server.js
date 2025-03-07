@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000; // Use the port provided by Railway or de
 
 // Allow requests from the frontend domain
 const allowedOrigins = [
-    'https://dawn-k-vinod.github.io', // Allow requests from GitHub Pages
+    'https://dawn-k-vinod.github.io/CodeForge-frontend/', // Allow requests from GitHub Pages
     'http://localhost:3000' // Allow requests from local development
 ];
 
