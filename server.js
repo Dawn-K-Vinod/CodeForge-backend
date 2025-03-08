@@ -51,6 +51,9 @@ app.post('/compile', (req, res) => {
 
         // Read the generated assembly file
         const assemblyCode = fs.readFileSync('temp.s', 'utf-8');
+        const formattedAssembly = assemblyCode.endsWith('\n') 
+            ? assemblyCode 
+            : assemblyCode + '\n';
 
         // Send the assembly code back to the frontend
         res.json({ assembly: assemblyCode });
