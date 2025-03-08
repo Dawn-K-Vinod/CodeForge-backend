@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 // Allow requests from the frontend domain
 const allowedOrigins = [
-    'https://dawn-k-vinod.github.io', // Frontend hosted on GitHub Pages
+    'https://codeforge-frontend.netlify.app/', // Frontend hosted on GitHub Pages
     'http://localhost:3000' // Local development
 ];
 
