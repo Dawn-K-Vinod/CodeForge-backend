@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 // Allow requests from the frontend domain
 const allowedOrigins = [
     'https://codeforge-frontend.netlify.app',
+    'https://dawn-k-vinod.github.io/CodeForge-frontend',
     'http://localhost:3000' // Local development
 ];
 
